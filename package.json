@@ -1,0 +1,32 @@
+{
+  "name": "csproj-webpack-plugin",
+  "version": "0.0.1",
+  "description": "A plugin to update .csproj with latest webpack built assets list",
+  "main": "dist/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "babel src -d dist"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/c3dr0x/csproj-webpack-plugin.git"
+  },
+  "keywords": [
+    "webpack",
+    "csproj",
+    "csharp",
+    "c#",
+    ".net"
+  ],
+  "author": "c3dr0x",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/c3dr0x/csproj-webpack-plugin/issues"
+  },
+  "homepage": "https://github.com/c3dr0x/csproj-webpack-plugin#readme",
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-preset-env": "^1.6.0",
+    "xml2js": "^0.4.19"
+  }
+}
