@@ -74,10 +74,11 @@ var CsprojPlugin = function () {
                     });
 
                     // 3- Add all new assets
-                    var newContentList = cleanedContentList.concat(assets.map(function (asset) {
+                    var assetsKeys = Object.keys(assets);
+                    var newContentList = cleanedContentList.concat(assetsKeys.map(function (assetKey) {
                         return {
                             '$': {
-                                'Include': _this.options.assetsLocation + asset
+                                'Include': _this.options.assetsLocation + assetKey
                             }
                         };
                     }));

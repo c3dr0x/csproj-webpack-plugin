@@ -19,7 +19,11 @@ var compiler = {
         console.log('event subscride: ' + eventName);
 
         var compilation = {
-            assets: ['asset1', 'asset2', 'asset3']
+            assets: {
+                'asset1': null,
+                'asset2': null,
+                'asset3': null
+            }
         };
 
         pluginCallback(compilation, this.callback);

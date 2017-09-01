@@ -45,9 +45,10 @@ class CsprojPlugin {
                 const cleanedContentList = contentList.filter(contentItem => !this.testContentItemToBeAsset(contentItem));
 
                 // 3- Add all new assets
-                const newContentList = cleanedContentList.concat(assets.map(asset => ({
+                const assetsKeys = Object.keys(assets);
+                const newContentList = cleanedContentList.concat(assetsKeys.map(assetKey => ({
                     '$': {
-                        'Include': this.options.assetsLocation + asset
+                        'Include': this.options.assetsLocation + assetKey
                     }
                 })));
 
