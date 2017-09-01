@@ -29,8 +29,7 @@ var CsprojPlugin = function () {
         _classCallCheck(this, CsprojPlugin);
 
         this.options = options;
-
-        this.loadCsprojFile = this.loadCsprojFile.bind(this);
+        this.testContentItemToBeAsset = this.testContentItemToBeAsset.bind(this);
     }
 
     /** @inheritdoc */
@@ -39,6 +38,8 @@ var CsprojPlugin = function () {
     _createClass(CsprojPlugin, [{
         key: 'apply',
         value: function apply(compiler) {
+            var _this = this;
+
             var options = this.options;
 
 
@@ -46,16 +47,58 @@ var CsprojPlugin = function () {
                 var assets = compilation.assets;
 
 
-                (0, _xml2js.parseString)(loadCsprojFile(), function (csproj) {
+                var csprojContent = _fs2.default.readFileSync(_this.options.csprojLocation, { encoding: 'utf8' });
+
+                (0, _xml2js.parseString)(csprojContent, function (error, csproj) {
+                    if (error) {
+                        throw error;
+                    }
+
+                    // 1- Find the right ItemGroup containing the assets
+                    var itemGroupIndex = csproj.Project.ItemGroup.findIndex(function (_ref) {
+                        var Content = _ref.Content;
+
+                        if (!Content) {
+                            return false;
+                        }
+
+                        // If at least one element match we find the right ItemGroup
+                        return Content.find(_this.testContentItemToBeAsset) !== undefined;
+                    });
+
+                    var contentList = csproj.Project.ItemGroup[itemGroupIndex].Content;
+
+                    // 2- Clean all previous assets
+                    var cleanedContentList = contentList.filter(function (contentItem) {
+                        return !_this.testContentItemToBeAsset(contentItem);
+                    });
+
+                    // 3- Add all new assets
+                    var newContentList = cleanedContentList.concat(assets.map(function (asset) {
+                        return {
+                            '$': {
+                                'Include': _this.options.assetsLocation + asset
+                            }
+                        };
+                    }));
+
+                    // 4- Replace ItemGroup
+                    csproj.Project.ItemGroup[itemGroupIndex].Content = newContentList;
+
+                    // 5- Write new file
+                    var builder = new _xml2js.Builder();
+                    var xml = builder.buildObject(csproj);
+
+                    _fs2.default.writeFileSync(_this.options.csprojLocation, xml, { encoding: 'utf8' });
 
                     callback();
                 });
             });
         }
     }, {
-        key: 'loadCsprojFile',
-        value: function loadCsprojFile() {
-            return _fs2.default.readFileSync(this.options.csprojLocation, { encoding: 'utf8' });
+        key: 'testContentItemToBeAsset',
+        value: function testContentItemToBeAsset(contentItem) {
+            return contentItem['$'] && contentItem['$'].Include.startsWith(this.options.assetsLocation);
         }
     }]);
 
